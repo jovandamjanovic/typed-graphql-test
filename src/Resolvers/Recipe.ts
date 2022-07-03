@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Arg, Args, Mutation, Query, Resolver } from 'type-graphql';
+import IRecipeService from '../Interfaces/RecipeService';
 import RecipeService from '../Services/RecipeService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
 @Resolver(Recipe)
 export class RecipeResolver {
-    private recipeService: RecipeService = new RecipeService();
+    private recipeService: IRecipeService = new RecipeService();
 
     @Query((returns) => Recipe)
     async recipe(@Arg('id') id: string) {

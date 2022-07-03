@@ -1,6 +1,7 @@
+import IRecipeService from '../Interfaces/RecipeService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
-export default class RecipeService {
+export default class RecipeService implements IRecipeService {
     private recipes: Recipe[] = [
         {
             id: '1',
