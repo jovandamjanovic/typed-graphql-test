@@ -1,9 +1,9 @@
 import { Recipe, RecipesArgs, NewRecipeInput } from '../Types/Recipe';
 
 interface IRecipeService {
-    findById(id: string): Recipe | undefined;
-    findAll({skip, take}: RecipesArgs): Recipe[];
-    addRecipe(recipeInput: NewRecipeInput): Recipe;
+    findById(id: string): Promise<Recipe | null | undefined>;
+    findAll({skip, take}: RecipesArgs): Promise<Recipe[]>;
+    addRecipe(recipeInput: NewRecipeInput): Promise<Recipe>;
     updateRecipe(recipe: Recipe): void;
     deleteRecipe(id: string): void;
 }

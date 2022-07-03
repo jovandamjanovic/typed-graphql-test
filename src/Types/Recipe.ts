@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { getModelForClass, prop, pre } from '@typegoose/typegoose';
 import { ArrayMaxSize, Length, Max, MaxLength, Min } from 'class-validator';
 import { ArgsType, Field, ID, InputType, Int, ObjectType } from 'type-graphql';
-import generate from '../Util/generate-id';
 
+@pre<Recipe>('save', function () {
+    this.creationDate = new Date();
+})
 @InputType()
 export class NewRecipeInput {
     @Field()
@@ -13,45 +15,49 @@ export class NewRecipeInput {
     @Length(30, 255)
     description?: string;
 
-    @Field((type) => [String])
+    @Field(() => [String])
     @ArrayMaxSize(30)
     ingredients!: string[];
 }
 
 @ObjectType()
 export class Recipe {
-    constructor({title, description, ingredients}: NewRecipeInput) {
+    constructor({ title, description, ingredients }: NewRecipeInput) {
         this.title = title;
         this.description = description;
         this.ingredients = ingredients;
-        this.id = generate(12);
-        this.creationDate = new Date();
     }
 
-    @Field((type) => ID)
-    id: string;
+    @Field(() => ID)
+    _id!: string;
 
+    @prop({ required: true })
     @Field()
-    title: string;
+    title!: string;
 
+    @prop()
     @Field({ nullable: true })
     description?: string;
 
     @Field()
-    creationDate: Date;
+    creationDate!: Date;
 
-    @Field((type) => [String])
-    ingredients: string[];
+    @prop({ type: () => [String], required: true })
+    @Field(() => [String])
+    ingredients!: string[];
 }
 
 @ArgsType()
 export class RecipesArgs {
-    @Field(type => Int)
+    @Field(() => Int)
     @Min(0)
     skip = 0;
 
-    @Field(type => Int)
+    @Field(() => Int)
     @Min(10)
     @Max(50)
     take = 25;
 }
+
+const RecipeModel = getModelForClass(Recipe);
+export { RecipeModel };

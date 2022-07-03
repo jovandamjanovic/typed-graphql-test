@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Arg, Args, Mutation, Query, Resolver } from 'type-graphql';
 import IRecipeService from '../Interfaces/RecipeService';
-import RecipeService from '../Services/RecipeService';
+import RecipeService from '../Services/RecipeMongoService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
 @Resolver(Recipe)
@@ -22,14 +22,12 @@ export class RecipeResolver {
         return this.recipeService.findAll(args);
     }
 
-    @Mutation(returns => Recipe)
-    addRecipe(
-        @Arg('newRecipe') newRecipeInput: NewRecipeInput
-    ): Recipe {
+    @Mutation((returns) => Recipe)
+    async addRecipe(@Arg('newRecipe') newRecipeInput: NewRecipeInput): Promise<Recipe> {
         return this.recipeService.addRecipe(newRecipeInput);
     }
 
-    @Mutation(returns => Boolean)
+    @Mutation((returns) => Boolean)
     removeRecipe(@Arg('id') id: string) {
         try {
             this.recipeService.deleteRecipe(id);
