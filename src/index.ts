@@ -3,11 +3,14 @@ import { ApolloServer } from 'apollo-server-express';
 import Express from 'express';
 import { buildSchema } from 'type-graphql';
 import { RecipeResolver } from './Resolvers/Recipe';
+import mongoose from 'mongoose';
+import { RecipeModel } from './Types/Recipe';
 
 const main = async () => {
     const schema = await buildSchema({
         resolvers: [RecipeResolver],
     });
+    await mongoose.connect('mongodb://localhost:27017/recipes');
 
     const apollo = new ApolloServer({ schema });
 
