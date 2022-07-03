@@ -86,3 +86,12 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Typescript build output
+dist
+
+# Yarn lockfile
+yarn.lock
+
+# VS Code configurations
+.vscode/settings
