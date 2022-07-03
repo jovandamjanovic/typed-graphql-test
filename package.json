@@ -13,14 +13,20 @@
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "eslint": "^8.16.0",
+    "husky": "^8.0.0",
     "prettier": "^2.6.2",
     "ts-node": "^10.8.0",
-    "typescript": "^4.6.4",
-    "husky": "^8.0.0"
+    "typescript": "^4.6.4"
   },
   "scripts": {
     "lint": "eslint . --fix",
     "start": "node ./dist/index.js",
     "prepare": "husky install"
+  },
+  "dependencies": {
+    "class-validator": "^0.13.2",
+    "graphql": "^16.5.0",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1"
   }
 }
