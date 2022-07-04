@@ -2,9 +2,6 @@ import { getModelForClass, prop, pre } from '@typegoose/typegoose';
 import { ArrayMaxSize, Length, Max, MaxLength, Min } from 'class-validator';
 import { ArgsType, Field, ID, InputType, Int, ObjectType } from 'type-graphql';
 
-@pre<Recipe>('save', function () {
-    this.creationDate = new Date();
-})
 @InputType()
 export class NewRecipeInput {
     @Field()
@@ -20,6 +17,9 @@ export class NewRecipeInput {
     ingredients!: string[];
 }
 
+@pre<Recipe>('save', function () {
+    this.creationDate = new Date();
+})
 @ObjectType()
 export class Recipe {
     constructor({ title, description, ingredients }: NewRecipeInput) {
@@ -39,6 +39,7 @@ export class Recipe {
     @Field({ nullable: true })
     description?: string;
 
+    @prop()
     @Field()
     creationDate!: Date;
 
