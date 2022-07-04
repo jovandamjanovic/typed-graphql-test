@@ -4,7 +4,7 @@ interface IRecipeService {
     findById(id: string): Promise<Recipe | null | undefined>;
     findAll({skip, take}: RecipesArgs): Promise<Recipe[]>;
     addRecipe(recipeInput: NewRecipeInput): Promise<Recipe>;
-    updateRecipe(recipe: Recipe): void;
+    updateRecipe(recipe: Recipe): Promise<void>;
     deleteRecipe(id: string): Promise<void>;
 }
 

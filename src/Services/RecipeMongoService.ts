@@ -26,7 +26,7 @@ export default class RecipeMongoService implements IRecipeService {
             throw error;
         }
     }
-    updateRecipe(recipe: Recipe): void {
+    updateRecipe(recipe: Recipe): Promise<void> {
         throw new Error('Method not implemented.');
     }
     async deleteRecipe(id: string): Promise<void> {
