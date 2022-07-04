@@ -4,7 +4,7 @@ import IRecipeService from '../Interfaces/RecipeService';
 import RecipeService from '../Services/RecipeMongoService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
-@Resolver(Recipe)
+@Resolver(of => Recipe)
 export class RecipeResolver {
     private recipeService: IRecipeService = new RecipeService();
 
