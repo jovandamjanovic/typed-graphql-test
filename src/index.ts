@@ -2,12 +2,11 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import Express from 'express';
 import { buildSchema } from 'type-graphql';
-import { RecipeResolver } from './Resolvers/Recipe';
 import mongoose from 'mongoose';
 
 const main = async () => {
     const schema = await buildSchema({
-        resolvers: [RecipeResolver],
+        resolvers: [__dirname + '/resolvers/**/*.{ts,js}'],
     });
     await mongoose.connect('mongodb://localhost:27017/recipes');
 
