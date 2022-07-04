@@ -1,6 +1,7 @@
 import { getModelForClass, prop, pre } from '@typegoose/typegoose';
 import { ArrayMaxSize, Length, Max, MaxLength, Min } from 'class-validator';
 import { ArgsType, Field, ID, InputType, Int, ObjectType } from 'type-graphql';
+import generate from '../Util/generate-id';
 
 @InputType()
 export class NewRecipeInput {
@@ -19,6 +20,7 @@ export class NewRecipeInput {
 
 @pre<Recipe>('save', function () {
     this.creationDate = new Date();
+    this._id = generate(12);
 })
 @ObjectType()
 export class Recipe {
@@ -28,6 +30,7 @@ export class Recipe {
         this.ingredients = ingredients;
     }
 
+    @prop()
     @Field(() => ID)
     _id!: string;
 
