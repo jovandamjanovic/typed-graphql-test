@@ -29,7 +29,11 @@ export default class RecipeMongoService implements IRecipeService {
     updateRecipe(recipe: Recipe): void {
         throw new Error('Method not implemented.');
     }
-    deleteRecipe(id: string): void {
-        throw new Error('Method not implemented.');
+    async deleteRecipe(id: string): Promise<void> {
+        try {
+            await RecipeModel.findByIdAndDelete(id);
+        } catch (error) {
+            throw error;
+        }
     }
 }

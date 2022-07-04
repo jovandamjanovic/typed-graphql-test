@@ -28,9 +28,9 @@ export class RecipeResolver {
     }
 
     @Mutation((returns) => Boolean)
-    removeRecipe(@Arg('id') id: string) {
+    async removeRecipe(@Arg('id') id: string): Promise<boolean> {
         try {
-            this.recipeService.deleteRecipe(id);
+            await this.recipeService.deleteRecipe(id);
             return true;
         } catch {
             return false;
