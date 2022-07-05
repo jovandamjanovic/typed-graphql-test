@@ -57,6 +57,20 @@ describe('Recipe Resolver', () => {
         expect(resultData.description).toEqual('Mislili su da je gotovo sa barutanom. Prevarili su se.');
         expect(resultData.ingredients).toHaveLength(6);
     });
+    it('fails to find a recipe with wrong id', async () => {
+        const query = `query Recipe($recipeId: String!) {
+            recipe(id: $recipeId) {
+              title
+              description
+              ingredients
+            }
+          }`;
+
+        const result = await graphql(schema, query, null, null, { recipeId: 'come invalid id' });
+        expect(result.data).toBeNull();
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors?.[0].message).toEqual('Recipe not found!');
+    });
     it('return a list of recipes', async () => {
         const query = `query {
             recipes {
