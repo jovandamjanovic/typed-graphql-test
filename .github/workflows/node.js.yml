@@ -20,8 +20,15 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
-    - name: Create mongoDB Docker container for API testing
-      uses: DigiPie/mongo-action@v1.0.1
     - run: yarn
     - run: yarn tsc
+    - name: Create mongoDB Docker container for API testing
+      uses: DigiPie/mongo-action@v1.0.1
     - run: yarn test
+    - name: Code Coverage Summary
+      uses: irongut/CodeCoverageSummary@v1.2.0
+      with:
+        filename: coverage/cobertura-coverage.xml
+        badge: true
+        format: markdown
+        output: both
