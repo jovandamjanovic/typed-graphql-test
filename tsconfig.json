@@ -8,6 +8,6 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true
     },
-    "include": ["src"],
+    "include": ["src", "__tests__/Recipe.test.ts"],
     "exclude": ["node_modules"]
 }

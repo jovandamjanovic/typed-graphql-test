@@ -5,7 +5,7 @@ import RecipeService from '../Services/RecipeMongoService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
 @Resolver(of => Recipe)
-export class RecipeResolver {
+class RecipeResolver {
     private recipeService: IRecipeService = new RecipeService();
 
     @Query((returns) => Recipe)
@@ -37,3 +37,5 @@ export class RecipeResolver {
         }
     }
 }
+
+export default RecipeResolver;
