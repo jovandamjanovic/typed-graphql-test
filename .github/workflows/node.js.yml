@@ -36,4 +36,4 @@ jobs:
       uses: yashanand1910/standard-release-notes@v1.2.1
       with:
         changelog_path: code-coverage-results.md
-        version: 0.0.3
+        version: ${{ github.ref }}
