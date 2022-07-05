@@ -32,8 +32,3 @@ jobs:
         badge: true
         format: markdown
         output: both
-    - name: Standard Release Notes
-      uses: yashanand1910/standard-release-notes@v1.2.1
-      with:
-        changelog_path: code-coverage-results.md
-        version: ${{ github.ref }}
