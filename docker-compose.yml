@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+    mongodb_container:
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: rootpassword
+            MONGO_INITDB_DATABASE: admin
+            DB_NAME: $DB_NAME
+            DB_USER: $DB_USER
+            DB_PASSWORD: $DB_PASSWORD
+            TEST_DB_NAME: $TEST_DB_NAME
+            TEST_DB_USER: $TEST_DB_USER
+            TEST_DB_PASSWORD: $TEST_DB_PASSWORD
+        ports:
+            - 127.0.0.1:8888:27017
+        volumes:
+            - mongodb_data_container:/data/db
+            - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+
+volumes:
+    mongodb_data_container:
