@@ -9,7 +9,7 @@ const port = process.env.DB_PORT || 27017;
 
 export const testConnection = async (drop = false) => {
     try {
-        const conn = await mongoose.connect(`mongodb://${authString}@localhost:${port}/${process.env.TEST_DB_NAME || ''}`);
+        const conn = await mongoose.connect(`mongodb://${authString}localhost:${port}/${process.env.TEST_DB_NAME || ''}`);
         const collectionList = ['recipes'];
         if (drop && conn.connection.db.listCollections({ name: 'recipes' })) {
             const existingCollections = await (await conn.connection.db.listCollections().toArray()).map((c) => c.name);
