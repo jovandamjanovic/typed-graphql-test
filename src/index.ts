@@ -10,7 +10,7 @@ const main = async () => {
         resolvers: [__dirname + '/resolvers/**/*.{ts,js}'],
     });
     await mongoose.connect(
-        `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:8888/${process.env.DB_NAME}`,
+        `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:${process.env.DB_PORT}/${process.env.DB_NAME}`,
     );
 
     const apollo = new ApolloServer({ schema });
