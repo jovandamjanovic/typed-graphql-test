@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import Express from 'express';
@@ -8,7 +9,9 @@ const main = async () => {
     const schema = await buildSchema({
         resolvers: [__dirname + '/resolvers/**/*.{ts,js}'],
     });
-    await mongoose.connect('mongodb://localhost:27017/recipes');
+    await mongoose.connect(
+        `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:8888/${process.env.DB_NAME}`,
+    );
 
     const apollo = new ApolloServer({ schema });
 
