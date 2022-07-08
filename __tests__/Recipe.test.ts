@@ -11,7 +11,7 @@ describe('Recipe Resolver', () => {
     let createdId: string;
 
     beforeAll(async () => {
-        conn = await testConnection(true);
+        conn = await testConnection();
         schema = await buildSchema({ resolvers: [RecipeResolver] });
     });
     it('adds a new recipe to the database', async () => {

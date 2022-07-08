@@ -48,7 +48,7 @@ describe('Character Resolver', () => {
     };
 
     beforeAll(async () => {
-        conn = await testConnection(true);
+        conn = await testConnection();
         schema = await buildSchema({ resolvers: [CharacterResolver] });
     });
     it('adds a new character to the database', async () => {
