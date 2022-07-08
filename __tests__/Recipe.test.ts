@@ -2,7 +2,7 @@ import { graphql, GraphQLSchema } from 'graphql';
 import { Connection } from 'mongoose';
 import { buildSchema } from 'type-graphql';
 import RecipeResolver from '../src/Resolvers/Recipe';
-import { Recipe } from '../src/Types/Recipe';
+import { Recipe, RecipeModel } from '../src/Types/Recipe';
 import { testConnection } from '../testUtils/testConn';
 
 describe('Recipe Resolver', () => {
@@ -12,6 +12,7 @@ describe('Recipe Resolver', () => {
 
     beforeAll(async () => {
         conn = await testConnection();
+        RecipeModel.remove({});
         schema = await buildSchema({ resolvers: [RecipeResolver] });
     });
     it('adds a new recipe to the database', async () => {

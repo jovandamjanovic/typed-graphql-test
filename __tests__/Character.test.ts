@@ -2,7 +2,7 @@ import { graphql, GraphQLSchema } from 'graphql';
 import { Connection } from 'mongoose';
 import { buildSchema } from 'type-graphql';
 import CharacterResolver from '../src/Resolvers/Character';
-import { Character, NewCharacterInput } from '../src/Types/Character';
+import { Character, CharacterModel, NewCharacterInput } from '../src/Types/Character';
 import { testConnection } from '../testUtils/testConn';
 
 describe('Character Resolver', () => {
@@ -49,6 +49,7 @@ describe('Character Resolver', () => {
 
     beforeAll(async () => {
         conn = await testConnection();
+        CharacterModel.remove({});
         schema = await buildSchema({ resolvers: [CharacterResolver] });
     });
     it('adds a new character to the database', async () => {
