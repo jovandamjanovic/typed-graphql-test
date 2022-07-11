@@ -7,21 +7,9 @@ const authString =
         : '';
 const port = process.env.DB_PORT || 27017;
 
-export const testConnection = async (drop = false) => {
+export const testConnection = async () => {
     try {
         const conn = await mongoose.connect(`mongodb://${authString}localhost:${port}/${process.env.TEST_DB_NAME || ''}`);
-        const collectionList = ['recipes'];
-        if (drop) {
-            const existingCollections = await (await conn.connection.db.listCollections().toArray()).map((c) => c.name);
-            await Promise.all(
-                collectionList.map(async (collection) => {
-                    if (!existingCollections.find((c) => c === collection)) {
-                        return;
-                    }
-                    return await conn.connection.collections[collection].drop();
-                }),
-            );
-        }
         return conn.connection;
     } catch (error) {
         console.log(error);

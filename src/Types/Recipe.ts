@@ -24,12 +24,6 @@ export class NewRecipeInput {
 })
 @ObjectType()
 export class Recipe {
-    constructor({ title, description, ingredients }: NewRecipeInput) {
-        this.title = title;
-        this.description = description;
-        this.ingredients = ingredients;
-    }
-
     @prop()
     @Field(() => ID)
     _id!: string;
