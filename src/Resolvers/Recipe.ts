@@ -4,7 +4,7 @@ import IRecipeService from '../Interfaces/RecipeService';
 import RecipeService from '../Services/RecipeMongoService';
 import { NewRecipeInput, Recipe, RecipesArgs } from '../Types/Recipe';
 
-@Resolver(of => Recipe)
+@Resolver((of) => Recipe)
 class RecipeResolver {
     private recipeService: IRecipeService = new RecipeService();
 
@@ -29,12 +29,7 @@ class RecipeResolver {
 
     @Mutation((returns) => Boolean)
     async removeRecipe(@Arg('id') id: string): Promise<boolean> {
-        try {
-            await this.recipeService.deleteRecipe(id);
-            return true;
-        } catch {
-            return false;
-        }
+        return await this.recipeService.deleteRecipe(id);
     }
 }
 

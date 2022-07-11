@@ -29,12 +29,7 @@ class CharacterResolver {
 
     @Mutation((returns) => Boolean)
     async removeCharacter(@Arg('id') id: string): Promise<boolean> {
-        try {
-            await this.characterService.deleteCharacter(id);
-            return true;
-        } catch {
-            return false;
-        }
+        return await this.characterService.deleteCharacter(id);
     }
 }
 

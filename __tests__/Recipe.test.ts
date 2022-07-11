@@ -1,27 +1,24 @@
-import { graphql, GraphQLSchema } from 'graphql';
 import { Connection } from 'mongoose';
-import { buildSchema } from 'type-graphql';
-import RecipeResolver from '../src/Resolvers/Recipe';
-import { Recipe, RecipeModel } from '../src/Types/Recipe';
+import { NewRecipeInput, Recipe, RecipeModel } from '../src/Types/Recipe';
+import gCall from '../src/Util/gCall';
 import { testConnection } from '../testUtils/testConn';
 
 describe('Recipe Resolver', () => {
-    let schema: GraphQLSchema;
     let conn: Connection | undefined;
     let createdId: string;
+    const newRecipe: NewRecipeInput = {
+        title: 'Stevan Sindjelic 3',
+        description: 'Mislili su da je gotovo sa barutanom. Prevarili su se.',
+        ingredients: ['Stevan', 'AK47', 'barutana', 'turci', 'turci', 'turci'],
+    };
 
     beforeAll(async () => {
         conn = await testConnection();
-        RecipeModel.remove({});
-        schema = await buildSchema({ resolvers: [RecipeResolver] });
+        await RecipeModel.deleteMany({});
     });
     it('adds a new recipe to the database', async () => {
-        const mutation = `mutation {
-            addRecipe(newRecipe: {
-                title: "Stevan Sindjelic 3",
-                description: "Mislili su da je gotovo sa barutanom. Prevarili su se.",
-                ingredients: ["Stevan", "AK47", "barutana", "turci", "turci", "turci"]
-            }) {
+        const source = `mutation AddRecipe($newRecipe: NewRecipeInput!){
+            addRecipe(newRecipe: $newRecipe) {
               _id
               title
               description
@@ -29,7 +26,8 @@ describe('Recipe Resolver', () => {
             }
         }`;
 
-        const result = await graphql(schema, mutation);
+        const result = await gCall({ source, variableValues: { newRecipe } });
+
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.addRecipe as Recipe;
@@ -41,7 +39,7 @@ describe('Recipe Resolver', () => {
         expect(resultData.ingredients).toHaveLength(6);
     });
     it('returns a single recipe by id from the database', async () => {
-        const query = `query Recipe($recipeId: String!) {
+        const source = `query Recipe($recipeId: String!) {
             recipe(id: $recipeId) {
               title
               description
@@ -49,7 +47,7 @@ describe('Recipe Resolver', () => {
             }
           }`;
 
-        const result = await graphql(schema, query, null, null, { recipeId: createdId });
+        const result = await gCall({ source, variableValues: { recipeId: createdId } });
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.recipe as Recipe;
@@ -59,7 +57,7 @@ describe('Recipe Resolver', () => {
         expect(resultData.ingredients).toHaveLength(6);
     });
     it('fails to find a recipe with wrong id', async () => {
-        const query = `query Recipe($recipeId: String!) {
+        const source = `query Recipe($recipeId: String!) {
             recipe(id: $recipeId) {
               title
               description
@@ -67,13 +65,14 @@ describe('Recipe Resolver', () => {
             }
           }`;
 
-        const result = await graphql(schema, query, null, null, { recipeId: 'come invalid id' });
+        const result = await gCall({ source, variableValues: { recipeId: 'some invalid id' } });
+
         expect(result.data).toBeNull();
         expect(result.errors).toHaveLength(1);
         expect(result.errors?.[0].message).toEqual('Recipe not found!');
     });
     it('return a list of recipes', async () => {
-        const query = `query {
+        const source = `query {
             recipes {
               _id
               title
@@ -81,7 +80,8 @@ describe('Recipe Resolver', () => {
             }
         }`;
 
-        const result = await graphql(schema, query);
+        const result = await gCall({ source });
+
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.recipes as Recipe[];
@@ -89,11 +89,11 @@ describe('Recipe Resolver', () => {
         expect(resultData).toHaveLength(1);
     });
     it('removes a recipe by id from the database', async () => {
-        const mutation = `mutation RemoveRecipe($removeRecipeId: String!) {
+        const source = `mutation RemoveRecipe($removeRecipeId: String!) {
             removeRecipe(id: $removeRecipeId)
           }`;
 
-        const result = await graphql(schema, mutation, null, null, { removeRecipeId: createdId });
+        const result = await gCall({ source, variableValues: { removeRecipeId: createdId } });
 
         expect(result.errors).toBeUndefined();
         expect(result.data?.removeRecipe).toBe(true);

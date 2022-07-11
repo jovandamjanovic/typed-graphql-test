@@ -5,7 +5,7 @@ interface ICharacterService {
     findAll(): Promise<Character[]>;
     addCharacter(characterInput: NewCharacterInput): Promise<Character>;
     updateCharacter(character: Character): Promise<void>;
-    deleteCharacter(id: string): Promise<void>;
+    deleteCharacter(id: string): Promise<boolean>;
 }
 
 export default ICharacterService;

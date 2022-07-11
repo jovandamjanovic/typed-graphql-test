@@ -1,12 +1,9 @@
-import { graphql, GraphQLSchema } from 'graphql';
 import { Connection } from 'mongoose';
-import { buildSchema } from 'type-graphql';
-import CharacterResolver from '../src/Resolvers/Character';
 import { Character, CharacterModel, NewCharacterInput } from '../src/Types/Character';
 import { testConnection } from '../testUtils/testConn';
+import gCall from '../src/Util/gCall';
 
 describe('Character Resolver', () => {
-    let schema: GraphQLSchema;
     let conn: Connection | undefined;
     let createdId: string;
     const testCharacter: NewCharacterInput = {
@@ -49,11 +46,10 @@ describe('Character Resolver', () => {
 
     beforeAll(async () => {
         conn = await testConnection();
-        CharacterModel.remove({});
-        schema = await buildSchema({ resolvers: [CharacterResolver] });
+        await CharacterModel.deleteMany({});
     });
     it('adds a new character to the database', async () => {
-        const mutation = `mutation AddCharacter($newCharacter: NewCharacterInput!) {
+        const source = `mutation AddCharacter($newCharacter: NewCharacterInput!) {
           addCharacter(newCharacter: $newCharacter) {
             _id
             name
@@ -65,7 +61,7 @@ describe('Character Resolver', () => {
           }
         }`;
 
-        const result = await graphql(schema, mutation, null, null, { newCharacter: testCharacter });
+        const result = await gCall({ source, variableValues: { newCharacter: testCharacter } });
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.addCharacter as Character;
@@ -77,19 +73,25 @@ describe('Character Resolver', () => {
         expect(resultData.stats).toHaveLength(6);
     });
     it('returns a single character by id from the database', async () => {
-        const query = `query Character($characterId: String!) {
+        const source = `query Character($characterId: String!) {
             character(id: $characterId) {
               _id
               name
               description
               stats {
                 name
-                value
               }
+              strength
+              dexterity
+              constitution
+              intelligence
+              wisdom
+              charisma
             }
           }`;
 
-        const result = await graphql(schema, query, null, null, { characterId: createdId });
+        const result = await gCall({ source, variableValues: { characterId: createdId } });
+
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.character as Character;
@@ -97,9 +99,19 @@ describe('Character Resolver', () => {
         expect(resultData.name).toEqual(testCharacter.name);
         expect(resultData.description).toEqual(testCharacter.description);
         expect(resultData.stats).toHaveLength(6);
+        expect(resultData.strength).toEqual(testCharacter.stats.find((stat) => stat.name === 'Strength')?.value);
+        expect(resultData.dexterity).toEqual(testCharacter.stats.find((stat) => stat.name === 'Dexterity')?.value);
+        expect(resultData.constitution).toEqual(
+            testCharacter.stats.find((stat) => stat.name === 'Constitution')?.value,
+        );
+        expect(resultData.intelligence).toEqual(
+            testCharacter.stats.find((stat) => stat.name === 'Intelligence')?.value,
+        );
+        expect(resultData.wisdom).toEqual(testCharacter.stats.find((stat) => stat.name === 'Wisdom')?.value);
+        expect(resultData.charisma).toEqual(testCharacter.stats.find((stat) => stat.name === 'Charisma')?.value);
     });
     it('fails to find a character with wrong id', async () => {
-        const query = `query Character($characterId: String!) {
+        const source = `query Character($characterId: String!) {
             character(id: $characterId) {
               _id
               name
@@ -111,25 +123,92 @@ describe('Character Resolver', () => {
             }
           }`;
 
-        const result = await graphql(schema, query, null, null, { characterId: 'come invalid id' });
+        const result = await gCall({ source, variableValues: { characterId: 'some invalid id' } });
+
         expect(result.data).toBeNull();
         expect(result.errors).toHaveLength(1);
         expect(result.errors?.[0].message).toEqual('Character not found!');
     });
+    describe('custom stats return null if stat not in stats', () => {
+        const inputChar: NewCharacterInput = {
+            name: 'testStat',
+            stats: [
+                { name: 't1', value: 10 },
+                { name: 't2', value: 10 },
+                { name: 't3', value: 10 },
+                { name: 't4', value: 10 },
+                { name: 't5', value: 10 },
+                { name: 't6', value: 10 },
+            ],
+        };
+        let createdChar: Character;
+        beforeEach(async () => {
+            const source = `mutation AddCharacter($newCharacter: NewCharacterInput!) {
+          addCharacter(newCharacter: $newCharacter) {
+            _id
+            strength
+            dexterity
+            constitution
+            intelligence
+            wisdom
+            charisma
+          }
+        }`;
+            const result = await gCall({ source, variableValues: { newCharacter: inputChar } });
+            createdChar = result.data?.addCharacter as Character;
+        });
+        afterEach(async () => {
+            const source = `mutation RemoveCharacter($removeCharacterId: String!) {
+            removeCharacter(id: $removeCharacterId)
+          }`;
+            await gCall({ source, variableValues: { removeCharacterId: createdChar._id } });
+        });
+        it('strength', async () => {
+            console.log(createdChar);
+            expect(createdChar.strength).toBeNull();
+        });
+        it('dexterity', async () => {
+            expect(createdChar.dexterity).toBeNull();
+        });
+        it('constitution', async () => {
+            expect(createdChar.constitution).toBeNull();
+        });
+        it('intelligence', async () => {
+            expect(createdChar.intelligence).toBeNull();
+        });
+        it('wisdom', async () => {
+            expect(createdChar.wisdom).toBeNull();
+        });
+        it('charisma', async () => {
+            expect(createdChar.charisma).toBeNull();
+        });
+    });
+    it('calculates the stat modifiers properly', async () => {
+        const source = `query Character($characterId: String!) {
+            character(id: $characterId) {
+              stats {
+                value
+                modifier
+              }
+            }
+          }`;
+
+        const result = await gCall({ source, variableValues: { characterId: createdId } });
+
+        expect(result.errors).toBeUndefined();
+        const testStat = result?.data?.character.stats[0];
+
+        expect(testStat.modifier).toEqual(Math.floor((testStat.value - 10) / 2));
+    });
+
     it('return a list of characters', async () => {
-        const query = `query {
+        const source = `query {
             characters {
               _id
-              name
-              description
-              stats {
-                name
-                value
-              }
             }
         }`;
 
-        const result = await graphql(schema, query);
+        const result = await gCall({ source });
         expect(result.errors).toBeUndefined();
 
         const resultData = result.data?.characters as Character[];
@@ -137,11 +216,11 @@ describe('Character Resolver', () => {
         expect(resultData).toHaveLength(1);
     });
     it('removes a character by id from the database', async () => {
-        const mutation = `mutation RemoveCharacter($removeCharacterId: String!) {
+        const source = `mutation RemoveCharacter($removeCharacterId: String!) {
             removeCharacter(id: $removeCharacterId)
           }`;
 
-        const result = await graphql(schema, mutation, null, null, { removeCharacterId: createdId });
+        const result = await gCall({ source, variableValues: { removeCharacterId: createdId } });
 
         expect(result.errors).toBeUndefined();
         expect(result.data?.removeCharacter).toBe(true);

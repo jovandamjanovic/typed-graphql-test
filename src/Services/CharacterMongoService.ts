@@ -26,9 +26,10 @@ export default class CharacterMongoService implements ICharacterService {
     async updateCharacter(character: Character): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    async deleteCharacter(id: string): Promise<void> {
+    async deleteCharacter(id: string): Promise<boolean> {
         try {
             await CharacterModel.findByIdAndDelete(id);
+            return true;
         } catch (error) {
             throw error;
         }

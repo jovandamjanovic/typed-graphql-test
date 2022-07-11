@@ -31,8 +31,8 @@ export class Stat {
     @Field({ nullable: true })
     abbreviation?: string;
 
-    @Field()
-    modifier(): number {
+    @Field({ nullable: true })
+    modifier?(): number {
         return Math.floor((this.value - 10) / 2);
     }
 }
@@ -72,7 +72,7 @@ export class Character {
     creationDate!: Date;
 
     @prop({ type: () => Stat, required: true })
-    @Field(() => [Stat])
+    @Field(() => [Stat], { defaultValue: [] })
     stats!: Stat[];
 
     @Field(() => Int, { nullable: true })
